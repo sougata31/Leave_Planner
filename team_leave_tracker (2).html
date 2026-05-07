@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Team Hub — Engineering</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --navy:    #0f1b2d;
+  --navy2:   #162236;
+  --navy3:   #1e3050;
+  --blue:    #2563eb;
+  --blue2:   #3b82f6;
+  --teal:    #0d9488;
+  --green:   #16a34a;
+  --amber:   #d97706;
+  --red:     #dc2626;
+  --purple:  #7c3aed;
+  --slate:   #64748b;
+  --slate2:  #94a3b8;
+  --border:  rgba(255,255,255,0.07);
+  --card:    rgba(255,255,255,0.04);
+  --card2:   rgba(255,255,255,0.07);
+  --text:    #e2e8f0;
+  --text2:   #94a3b8;
+  --text3:   #64748b;
+  --sick-bg:      rgba(220,38,38,0.12);
+  --sick-fg:      #fca5a5;
+  --sick-border:  rgba(220,38,38,0.3);
+  --plan-bg:      rgba(22,163,74,0.12);
+  --plan-fg:      #86efac;
+  --plan-border:  rgba(22,163,74,0.3);
+  --emer-bg:      rgba(217,119,6,0.12);
+  --emer-fg:      #fcd34d;
+  --emer-border:  rgba(217,119,6,0.3);
+  --pers-bg:      rgba(124,58,237,0.12);
+  --pers-fg:      #c4b5fd;
+  --pers-border:  rgba(124,58,237,0.3);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--navy);
+  color:var(--text);
+  min-height:100vh;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(37,99,235,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 80%, rgba(13,148,136,0.08) 0%, transparent 50%);
+}
+
+/* ── Layout ── */
+.shell{display:flex;min-height:100vh}
+.sidebar{
+  width:220px;flex-shrink:0;
+  background:rgba(15,27,45,0.95);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  padding:0;position:sticky;top:0;height:100vh;
+  backdrop-filter:blur(20px);
+}
+.sidebar-logo{
+  padding:24px 20px 20px;
+  border-bottom:1px solid var(--border);
+}
+.sidebar-logo span{
+  font-size:15px;font-weight:700;color:var(--text);
+  display:flex;align-items:center;gap:8px;
+}
+.sidebar-logo small{display:block;font-size:11px;color:var(--text3);margin-top:3px;margin-left:28px}
+.nav-section{padding:16px 0 8px}
+.nav-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;padding:0 16px 6px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 16px;cursor:pointer;
+  font-size:13px;font-weight:500;color:var(--text2);
+  border-left:2px solid transparent;
+  transition:all .15s;
+}
+.nav-item:hover{color:var(--text);background:var(--card)}
+.nav-item.active{color:var(--blue2);border-left-color:var(--blue2);background:rgba(59,130,246,0.08)}
+.nav-icon{font-size:15px;width:18px;text-align:center}
+.sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
+.sidebar-footer p{font-size:11px;color:var(--text3)}
+
+.main{flex:1;overflow:auto}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 28px;
+  border-bottom:1px solid var(--border);
+  background:rgba(15,27,45,0.8);
+  backdrop-filter:blur(20px);
+  position:sticky;top:0;z-index:50;
+}
+.topbar-title{font-size:17px;font-weight:700;color:var(--text)}
+.topbar-meta{font-size:12px;color:var(--text3);margin-top:1px}
+.topbar-right{display:flex;gap:8px;align-items:center}
+
+.content{padding:24px 28px}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:7px;
+  font-size:12px;font-weight:600;cursor:pointer;
+  border:1px solid var(--border);
+  background:var(--card2);color:var(--text2);
+  transition:all .15s;font-family:inherit;
+}
+.btn:hover{background:rgba(255,255,255,0.1);color:var(--text)}
+.btn-primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn-primary:hover{background:#1d4ed8;border-color:#1d4ed8}
+.btn-teal{background:var(--teal);border-color:var(--teal);color:#fff}
+.btn-teal:hover{background:#0f766e}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-danger{color:#fca5a5;border-color:rgba(220,38,38,0.3);background:rgba(220,38,38,0.08)}
+.btn-danger:hover{background:rgba(220,38,38,0.18)}
+
+/* ── Stats cards ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:18px 20px;
+  position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.03) 0%,transparent 60%);
+  pointer-events:none;
+}
+.stat-icon{font-size:22px;margin-bottom:10px}
+.stat-val{font-size:28px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1}
+.stat-label{font-size:11px;color:var(--text3);margin-top:5px;font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.stat-card.c-blue  .stat-val{color:var(--blue2)}
+.stat-card.c-teal  .stat-val{color:#2dd4bf}
+.stat-card.c-green .stat-val{color:#4ade80}
+.stat-card.c-amber .stat-val{color:#fbbf24}
+
+/* ── Section ── */
+.section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:20px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.section-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.section-title .dot{width:7px;height:7px;border-radius:50%;background:var(--blue2)}
+
+/* ── Members grid ── */
+.members-grid{display:flex;flex-wrap:wrap;gap:10px}
+.member-card{
+  display:flex;align-items:center;gap:10px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:10px;padding:10px 14px;
+  min-width:160px;cursor:pointer;
+  transition:all .15s;
+}
+.member-card:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);transform:translateY(-1px)}
+.avatar{
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;flex-shrink:0;
+}
+.av0{background:rgba(37,99,235,.25);color:#93c5fd}
+.av1{background:rgba(13,148,136,.25);color:#5eead4}
+.av2{background:rgba(124,58,237,.25);color:#c4b5fd}
+.av3{background:rgba(220,38,38,.25);color:#fca5a5}
+.av4{background:rgba(217,119,6,.25);color:#fcd34d}
+.av5{background:rgba(22,163,74,.25);color:#86efac}
+.av6{background:rgba(59,130,246,.25);color:#bfdbfe}
+.av7{background:rgba(236,72,153,.25);color:#f9a8d4}
+.av8{background:rgba(234,179,8,.25);color:#fef08a}
+.member-name{font-size:12px;font-weight:600;color:var(--text)}
+.member-role{font-size:11px;color:var(--text3)}
+.add-member-btn{
+  display:flex;align-items:center;gap:8px;
+  background:transparent;border:1px dashed rgba(59,130,246,0.4);
+  border-radius:10px;padding:10px 14px;
+  font-size:12px;color:rgba(59,130,246,0.7);cursor:pointer;
+  min-width:140px;transition:all .15s;font-family:inherit;
+}
+.add-member-btn:hover{border-color:var(--blue2);color:var(--blue2);background:rgba(37,99,235,.08)}
+
+/* ── Calendar ── */
+.cal-controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cal-nav-group{display:flex;align-items:center;gap:10px}
+.cal-title{font-size:16px;font-weight:700;color:var(--text);min-width:150px;text-align:center}
+.view-toggle{display:flex;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:3px;gap:2px}
+.vbtn{padding:5px 14px;border:none;background:transparent;color:var(--text2);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
+.vbtn.active{background:var(--blue);color:#fff}
+
+.cal-grid-wrap{border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.cal-dow-header{display:grid;grid-template-columns:repeat(7,1fr);background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border)}
+.dow-cell{text-align:center;padding:10px 0;font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.05em;text-transform:uppercase}
+.dow-cell.we{color:rgba(100,116,139,0.5)}
+
+.cal-body{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-day{
+  border-right:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  min-height:90px;padding:8px;
+  cursor:pointer;transition:background .12s;
+  position:relative;
+}
+.cal-day:nth-child(7n){border-right:none}
+.cal-day:hover{background:rgba(255,255,255,0.04)}
+.cal-day.weekend{background:rgba(0,0,0,0.2);cursor:default}
+.cal-day.weekend:hover{background:rgba(0,0,0,0.2)}
+.cal-day.other-month .dn{color:var(--text3);opacity:.35}
+.cal-day.other-month{opacity:.5}
+.cal-day.today .dn-inner{background:var(--blue);color:#fff;border-radius:50%}
+.cal-day.today{background:rgba(37,99,235,.04)}
+.dn{margin-bottom:5px}
+.dn-inner{width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--text2)}
+.leave-tag{
+  font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;
+  margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  cursor:pointer;display:block;
+}
+.tag-sick    {background:var(--sick-bg);color:var(--sick-fg);border:1px solid var(--sick-border)}
+.tag-planned {background:var(--plan-bg);color:var(--plan-fg);border:1px solid var(--plan-border)}
+.tag-emergency{background:var(--emer-bg);color:var(--emer-fg);border:1px solid var(--emer-border)}
+.tag-personal{background:var(--pers-bg);color:var(--pers-fg);border:1px solid var(--pers-border)}
+.more-tag{font-size:10px;color:var(--blue2);margin-top:3px;cursor:pointer;font-weight:600}
+
+/* Week view */
+.week-table{width:100%;border-collapse:collapse}
+.week-table th{
+  padding:10px 8px;font-size:11px;font-weight:600;
+  color:var(--text3);text-transform:uppercase;letter-spacing:.05em;
+  border-bottom:1px solid var(--border);text-align:center;
+}
+.week-table th.we{color:rgba(100,116,139,0.4)}
+.week-table td{
+  padding:10px 8px;border-bottom:1px solid var(--border);
+  border-right:1px solid var(--border);vertical-align:top;
+  min-height:80px;cursor:pointer;transition:background .12s;
+}
+.week-table td:last-child{border-right:none}
+.week-table td:hover{background:rgba(255,255,255,0.03)}
+.week-table td.we{background:rgba(0,0,0,0.15);cursor:default}
+.week-table td.we:hover{background:rgba(0,0,0,0.15)}
+.week-date-num{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:6px}
+.week-today .week-date-num{color:var(--blue2)}
+.week-add-hint{font-size:10px;color:var(--text3);margin-top:4px;opacity:0}
+.week-table td:hover .week-add-hint{opacity:1}
+
+/* Legend */
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);font-weight:500}
+.legend-dot{width:8px;height:8px;border-radius:3px}
+
+/* ── Leave Log table ── */
+.log-table{width:100%;border-collapse:collapse}
+.log-table thead th{
+  padding:10px 14px;font-size:11px;font-weight:600;
+  color:var(--text3);text-transform:uppercase;letter-spacing:.06em;
+  border-bottom:1px solid var(--border);text-align:left;
+}
+.log-table tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+.log-table tbody tr:hover{background:rgba(255,255,255,0.03)}
+.log-table tbody tr:last-child{border-bottom:none}
+.log-table td{padding:11px 14px;font-size:12px;vertical-align:middle}
+.delete-member-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:50%;border:none;
+  background:rgba(220,38,38,0.15);color:#fca5a5;
+  font-size:11px;cursor:pointer;margin-left:auto;flex-shrink:0;
+  transition:all .15s;
+}
+.delete-member-btn:hover{background:rgba(220,38,38,0.45);color:#fff;transform:scale(1.15)}
+
+/* Monthly Summary */
+.sum-table{width:100%;border-collapse:collapse}
+.sum-table th{padding:10px 12px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);text-align:center}
+.sum-table th:first-child{text-align:left}
+.sum-table td{padding:11px 12px;font-size:12px;border-bottom:1px solid var(--border);text-align:center;font-family:'DM Mono',monospace}
+.sum-table td:first-child{text-align:left;font-family:'DM Sans',sans-serif;font-weight:600;color:var(--text)}
+.sum-table tbody tr:hover{background:rgba(255,255,255,0.03)}
+.sum-table tfoot td{font-weight:700;color:var(--blue2);border-top:1px solid var(--border);border-bottom:none}
+.sum-table tfoot td:first-child{color:var(--text)}
+.cell-val{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;border-radius:6px;font-size:12px;font-weight:600;
+}
+.cv-0{color:var(--text3)}
+.cv-1{background:rgba(22,163,74,.15);color:#4ade80}
+.cv-2{background:rgba(22,163,74,.25);color:#4ade80}
+.cv-3plus{background:rgba(220,38,38,.2);color:#fca5a5}
+
+/* ── Modals ── */
+.overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.65);backdrop-filter:blur(6px);
+  z-index:200;align-items:center;justify-content:center;
+}
+.overlay.open{display:flex}
+.modal{
+  background:#1a2942;border:1px solid rgba(255,255,255,0.1);
+  border-radius:16px;padding:28px;width:100%;max-width:440px;
+  box-shadow:0 24px 64px rgba(0,0,0,.5);
+}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.modal-title{font-size:16px;font-weight:700;color:var(--text)}
+.modal-close{background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:4px}
+.modal-close:hover{color:var(--text);background:var(--card2)}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;letter-spacing:.02em}
+.field input,.field select,.field textarea{
+  width:100%;padding:10px 12px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px;color:var(--text);font-size:13px;
+  outline:none;transition:border .15s;font-family:'DM Sans',sans-serif;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue2)}
+.field select option{background:#1a2942}
+.field textarea{height:80px;resize:vertical}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+
+/* Detail popup */
+.detail-pop{
+  display:none;position:fixed;
+  background:#1a2942;border:1px solid rgba(255,255,255,0.12);
+  border-radius:12px;padding:16px 18px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+  z-index:300;min-width:230px;max-width:280px;
+}
+.detail-pop.open{display:block}
+.dp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.dp-title{font-size:13px;font-weight:700;color:var(--text)}
+.dp-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 5px;border-radius:4px}
+.dp-close:hover{background:var(--card2)}
+.dp-row{font-size:12px;color:var(--text2);margin-bottom:6px;line-height:1.5}
+.dp-row strong{color:var(--text)}
+
+/* Tabs */
+.tab-nav{display:flex;gap:2px;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:24px;width:fit-content}
+.tab-btn{padding:8px 18px;border:none;background:transparent;color:var(--text2);border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
+.tab-btn.active{background:var(--blue);color:#fff}
+
+/* Animations */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.tab-content{animation:fadeIn .2s ease}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+
+/* Empty state */
+.empty-state{text-align:center;padding:40px;color:var(--text3)}
+.empty-state .icon{font-size:32px;margin-bottom:12px}
+.empty-state p{font-size:13px}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:#1e3a5f;border:1px solid rgba(59,130,246,.4);
+  color:var(--text);padding:12px 18px;border-radius:10px;
+  font-size:13px;font-weight:500;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
+  z-index:999;transform:translateY(80px);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;gap:8px;
+}
+.toast.show{transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span>🏠 Team Hub</span>
+      <small>Engineering Division</small>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Navigation</div>
+      <div class="nav-item active" onclick="showTab('dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-item" onclick="showTab('calendar')"><span class="nav-icon">📆</span> Calendar</div>
+      <div class="nav-item" onclick="showTab('log')"><span class="nav-icon">📋</span> Leave Log</div>
+      <div class="nav-item" onclick="showTab('summary')"><span class="nav-icon">📈</span> Summary</div>
+      <div class="nav-item" onclick="showTab('members')"><span class="nav-icon">👥</span> Members</div>
+    </div>
+    <div class="sidebar-footer">
+      <p id="sidebarDate"></p>
+      <p style="margin-top:4px;color:#3b82f6;font-size:11px">● Live data</p>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbarTitle">Dashboard</div>
+        <div class="topbar-meta" id="topbarMeta">Overview of your team</div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddLeave(null)">+ Add Leave</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- ═══ DASHBOARD ═══ -->
+      <div id="tab-dashboard" class="tab-content">
+        <div class="stats-row">
+          <div class="stat-card c-blue">
+            <div class="stat-icon">👥</div>
+            <div class="stat-val" id="statMembers">9</div>
+            <div class="stat-label">Total Members</div>
+          </div>
+          <div class="stat-card c-teal">
+            <div class="stat-icon">🏖</div>
+            <div class="stat-val" id="statToday">0</div>
+            <div class="stat-label">On Leave Today</div>
+          </div>
+          <div class="stat-card c-green">
+            <div class="stat-icon">📅</div>
+            <div class="stat-val" id="statMonth">0</div>
+            <div class="stat-label">This Month</div>
+          </div>
+          <div class="stat-card c-amber">
+            <div class="stat-icon">⏭</div>
+            <div class="stat-val" id="statUpcoming">0</div>
+            <div class="stat-label">Upcoming</div>
+          </div>
+        </div>
+
+        <!-- Members section -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title"><span class="dot"></span> Team Members</div>
+            <button class="btn btn-primary btn-sm" onclick="openAddMember()">+ Add Member</button>
+          </div>
+          <div class="members-grid" id="membersGrid"></div>
+        </div>
+
+        <!-- Recent leaves -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title"><span class="dot" style="background:#2dd4bf"></span> Recent Leaves</div>
+            <button class="btn btn-sm" onclick="showTab('log')">View All →</button>
+          </div>
+          <div id="recentLeaves"></div>
+        </div>
+      </div>
+
+      <!-- ═══ CALENDAR ═══ -->
+      <div id="tab-calendar" class="tab-content" style="display:none">
+        <div class="section">
+          <div class="cal-controls">
+            <div class="cal-nav-group">
+              <button class="btn btn-sm" onclick="navigate(-1)">‹</button>
+              <span class="cal-title" id="calTitle"></span>
+              <button class="btn btn-sm" onclick="navigate(1)">›</button>
+              <button class="btn btn-sm" onclick="goToday()">Today</button>
+            </div>
+            <div class="view-toggle">
+              <button class="vbtn active" id="btnMonth" onclick="switchView('month')">Month</button>
+              <button class="vbtn" id="btnWeek" onclick="switchView('week')">Week</button>
+            </div>
+          </div>
+          <div id="calContainer"></div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--sick-bg);border:1px solid var(--sick-border)"></div>Sick Leave</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--plan-bg);border:1px solid var(--plan-border)"></div>Planned Leave</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--emer-bg);border:1px solid var(--emer-border)"></div>Emergency Leave</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--pers-bg);border:1px solid var(--pers-border)"></div>Personal Leave</div>
+            <div class="legend-item" style="margin-left:auto"><div class="legend-dot" style="background:rgba(0,0,0,.2);border:1px solid var(--border)"></div>Weekend</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ LEAVE LOG ═══ -->
+      <div id="tab-log" class="tab-content" style="display:none">
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title"><span class="dot" style="background:#4ade80"></span> All Leave Entries</div>
+            <div style="display:flex;gap:8px">
+              <select id="filterMember" class="btn btn-sm" onchange="renderLog()" style="cursor:pointer">
+                <option value="">All Members</option>
+              </select>
+              <select id="filterType" class="btn btn-sm" onchange="renderLog()" style="cursor:pointer">
+                <option value="">All Types</option>
+                <option value="sick">Sick Leave</option>
+                <option value="planned">Planned Leave</option>
+                <option value="emergency">Emergency Leave</option>
+                <option value="personal">Personal Leave</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="openAddLeave(null)">+ Add Leave</button>
+            </div>
+          </div>
+          <div id="logContainer"></div>
+        </div>
+      </div>
+
+      <!-- ═══ SUMMARY ═══ -->
+      <div id="tab-summary" class="tab-content" style="display:none">
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title"><span class="dot" style="background:#fbbf24"></span> Monthly Leave Summary</div>
+          </div>
+          <div id="summaryContainer"></div>
+        </div>
+      </div>
+
+      <!-- ═══ MEMBERS ═══ -->
+      <div id="tab-members" class="tab-content" style="display:none">
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title"><span class="dot" style="background:#c4b5fd"></span> Team Members</div>
+            <button class="btn btn-primary btn-sm" onclick="openAddMember()">+ Add Member</button>
+          </div>
+          <div id="membersFullGrid"></div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- Leave Modal -->
+<div class="overlay" id="leaveOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="leaveModalTitle">Add Leave</div>
+      <button class="modal-close" onclick="closeLeaveModal()">✕</button>
+    </div>
+    <div class="field">
+      <label>Member Name</label>
+      <select id="leaveNameSel"></select>
+    </div>
+    <div class="field">
+      <label>Leave Date</label>
+      <input type="date" id="leaveDateInput"/>
+    </div>
+    <div class="field">
+      <label>Leave Type</label>
+      <select id="leaveTypeSel">
+        <option value="sick">Sick Leave</option>
+        <option value="planned">Planned Leave</option>
+        <option value="emergency">Emergency Leave</option>
+        <option value="personal">Personal Leave</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Reason / Notes</label>
+      <textarea id="leaveReason" placeholder="Enter reason for leave..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeLeaveModal()">Cancel</button>
+      <button class="btn btn-teal" onclick="saveLeave()">✓ Save Leave</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Member Modal -->
+<div class="overlay" id="memberOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Team Member</div>
+      <button class="modal-close" onclick="closeMemberModal()">✕</button>
+    </div>
+    <div class="field"><label>Full Name</label><input type="text" id="newName" placeholder="e.g. Rahul Das"/></div>
+    <div class="field"><label>Role / Designation</label><input type="text" id="newRole" placeholder="e.g. Backend Developer"/></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeMemberModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNewMember()">+ Add Member</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Popup -->
+<div class="detail-pop" id="detailPop">
+  <div class="dp-header">
+    <div class="dp-title" id="dpTitle">Leave Details</div>
+    <button class="dp-close" onclick="closeDetail()">✕</button>
+  </div>
+  <div class="dp-row">Member: <strong id="dpName"></strong></div>
+  <div class="dp-row">Type: <strong id="dpType"></strong></div>
+  <div class="dp-row">Reason: <strong id="dpReason"></strong></div>
+  <div style="margin-top:12px;display:flex;gap:6px">
+    <button class="btn btn-danger btn-sm" onclick="deleteLeave()">✕ Remove</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✓ <span id="toastMsg"></span></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+let members = [
+  {name:'Arjun Roy',     role:'Tech Lead'},
+  {name:'Priya Sen',     role:'Backend Dev'},
+  {name:'Dev Mukherjee', role:'Frontend Dev'},
+  {name:'Sana Khan',     role:'QA Engineer'},
+  {name:'Ritesh Bose',   role:'DevOps'},
+  {name:'Tanya Ghosh',   role:'Product'},
+  {name:'Nikhil Kumar',  role:'Backend Dev'},
+  {name:'Meera Pillai',  role:'UI Designer'},
+  {name:'Sourav Biswas', role:'Analyst'},
+];
+
+const today = new Date();
+today.setHours(0,0,0,0);
+function ds(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+
+let leaves = [
+  {date:`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-09`, name:'Priya Sen',     type:'sick',      reason:'Fever and cold'},
+  {date:`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-11`, name:'Dev Mukherjee',type:'planned',   reason:'Family vacation'},
+  {date:`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-16`, name:'Sana Khan',    type:'emergency', reason:'Family emergency'},
+  {date:`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-22`, name:'Ritesh Bose',  type:'personal',  reason:'Personal appointment'},
+  {date:`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-25`, name:'Tanya Ghosh',  type:'planned',   reason:'Attending wedding'},
+];
+
+let currentDate = new Date(today);
+let currentView = 'month';
+let activeTab = 'dashboard';
+let selectedDateStr = '';
+let detailIdx = -1;
+
+// ═══════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════
+const avClass = ['av0','av1','av2','av3','av4','av5','av6','av7','av8'];
+function initials(n){return n.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase()}
+function typeLabel(t){return {sick:'Sick Leave',planned:'Planned Leave',emergency:'Emergency Leave',personal:'Personal Leave'}[t]||t}
+function tagClass(t){return `tag-${t}`}
+
+function toast(msg){
+  const el = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2800);
+}
+
+function formatDate(dateStr){
+  const d = new Date(dateStr+'T00:00:00');
+  return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// ═══════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════
+const tabTitles = {
+  dashboard:['Dashboard','Overview of your team'],
+  calendar: ['Calendar','Click any weekday to add leave'],
+  log:      ['Leave Log','All leave entries'],
+  summary:  ['Monthly Summary','Leave counts by member & month'],
+  members:  ['Team Members','Manage your team'],
+};
+
+function showTab(tab){
+  activeTab = tab;
+  document.querySelectorAll('.tab-content').forEach(el=>el.style.display='none');
+  document.getElementById(`tab-${tab}`).style.display='block';
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.classList.toggle('active', el.textContent.trim().toLowerCase().includes(tab==='log'?'leave':tab==='summary'?'summary':tab));
+  });
+  const [title,meta] = tabTitles[tab]||['',''];
+  document.getElementById('topbarTitle').textContent = title;
+  document.getElementById('topbarMeta').textContent = meta;
+  if(tab==='calendar') render();
+  if(tab==='log') renderLog();
+  if(tab==='summary') renderSummary();
+  if(tab==='members') renderMembersFull();
+}
+
+// ═══════════════════════════════════════════
+//  STATS & DASHBOARD
+// ═══════════════════════════════════════════
+function updateStats(){
+  const todayStr = ds(today);
+  const now = new Date();
+  document.getElementById('statMembers').textContent = members.length;
+  document.getElementById('statToday').textContent   = leaves.filter(l=>l.date===todayStr).length;
+  document.getElementById('statMonth').textContent   = leaves.filter(l=>{
+    const d=new Date(l.date+'T00:00:00');
+    return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();
+  }).length;
+  document.getElementById('statUpcoming').textContent = leaves.filter(l=>new Date(l.date+'T00:00:00')>today).length;
+}
+
+function renderMembersGrid(){
+  const grid = document.getElementById('membersGrid');
+  if(!grid) return;
+  grid.innerHTML = members.map((m,i)=>`
+    <div class="member-card">
+      <div class="avatar ${avClass[i%avClass.length]}">${initials(m.name)}</div>
+      <div><div class="member-name">${m.name}</div><div class="member-role">${m.role}</div></div>
+      <button class="delete-member-btn" onclick="event.stopPropagation();deleteMember(${i})" title="Remove member">✕</button>
+    </div>`).join('') +
+    `<button class="add-member-btn" onclick="openAddMember()">＋ Add member</button>`;
+}
+
+function renderMembersFull(){
+  const grid = document.getElementById('membersFullGrid');
+  if(!grid) return;
+  const memberLeaveCount = name => leaves.filter(l=>l.name===name).length;
+  grid.innerHTML = `
+  <table class="log-table">
+    <thead><tr>
+      <th>#</th><th>Member</th><th>Role</th>
+      <th>Total Leaves</th><th>This Month</th><th>Last Leave</th><th>Action</th>
+    </tr></thead>
+    <tbody>
+    ${members.map((m,i)=>{
+      const now=new Date();
+      const thisMonth = leaves.filter(l=>{
+        const d=new Date(l.date+'T00:00:00');
+        return l.name===m.name&&d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+      }).length;
+      const memberLeaves = leaves.filter(l=>l.name===m.name).map(l=>l.date).sort();
+      const lastLeave = memberLeaves.length ? formatDate(memberLeaves[memberLeaves.length-1]) : '—';
+      return `<tr>
+        <td style="color:var(--text3);font-family:'DM Mono'">${i+1}</td>
+        <td><div style="display:flex;align-items:center;gap:8px">
+          <div class="avatar ${avClass[i%avClass.length]}" style="width:28px;height:28px;font-size:10px">${initials(m.name)}</div>
+          <span style="font-weight:600">${m.name}</span></div></td>
+        <td style="color:var(--text2)">${m.role}</td>
+        <td style="font-family:'DM Mono';text-align:center;color:var(--blue2)">${memberLeaveCount(m.name)}</td>
+        <td style="font-family:'DM Mono';text-align:center;color:var(--text2)">${thisMonth}</td>
+        <td style="color:var(--text2)">${lastLeave}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteMember(${i})">✕ Remove</button></td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table>
+  <div style="margin-top:14px">
+    <button class="btn btn-primary btn-sm" onclick="openAddMember()">+ Add New Member</button>
+  </div>`;
+}
+
+function renderRecentLeaves(){
+  const el = document.getElementById('recentLeaves');
+  if(!el) return;
+  const recent = [...leaves].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+  if(!recent.length){
+    el.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>No leaves recorded yet. Click "+ Add Leave" to get started.</p></div>`;
+    return;
+  }
+  el.innerHTML = `<table class="log-table">
+    <thead><tr><th>Member</th><th>Date</th><th>Type</th><th>Reason</th></tr></thead>
+    <tbody>${recent.map((l,i)=>`<tr>
+      <td style="font-weight:600">${l.name}</td>
+      <td style="color:var(--text2);font-family:'DM Mono'">${formatDate(l.date)}</td>
+      <td><span class="leave-tag ${tagClass(l.type)}" style="display:inline-block">${typeLabel(l.type)}</span></td>
+      <td style="color:var(--text2);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.reason||'—'}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function updateMemberSelects(){
+  const opts = members.map(m=>`<option>${m.name}</option>`).join('');
+  document.getElementById('leaveNameSel').innerHTML = opts;
+  const filter = document.getElementById('filterMember');
+  if(filter) filter.innerHTML = `<option value="">All Members</option>` + members.map(m=>`<option>${m.name}</option>`).join('');
+}
+
+// ═══════════════════════════════════════════
+//  CALENDAR
+// ═══════════════════════════════════════════
+function render(){
+  if(currentView==='month') renderMonth(); else renderWeek();
+}
+
+function renderMonth(){
+  const y=currentDate.getFullYear(), m=currentDate.getMonth();
+  document.getElementById('calTitle').textContent = `${MONTHS[m]} ${y}`;
+  const first = new Date(y,m,1).getDay();
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const prevDays = new Date(y,m,0).getDate();
+  const todayStr = ds(today);
+
+  let cells=[];
+  for(let i=first-1;i>=0;i--) cells.push({day:prevDays-i,cur:false});
+  for(let d=1;d<=daysInMonth;d++) cells.push({day:d,cur:true});
+  while(cells.length%7!==0) cells.push({day:cells.length-first-daysInMonth+1,cur:false});
+
+  let html=`<div class="cal-grid-wrap"><div class="cal-dow-header">`;
+  DAYS.forEach((d,i)=>html+=`<div class="dow-cell${i===0||i===6?' we':''}">${d}</div>`);
+  html+=`</div><div class="cal-body">`;
+
+  cells.forEach((c,idx)=>{
+    const dow=idx%7, isWe=dow===0||dow===6;
+    const dStr=c.cur?`${y}-${String(m+1).padStart(2,'0')}-${String(c.day).padStart(2,'0')}`:'';
+    const isToday=dStr===todayStr;
+    const dayLeaves=dStr?leaves.filter(l=>l.date===dStr):[];
+    let cls='cal-day';
+    if(isWe) cls+=' weekend';
+    if(!c.cur) cls+=' other-month';
+    if(isToday) cls+=' today';
+    const click=(!isWe&&c.cur)?`onclick="openAddLeave('${dStr}')"`:'';
+    html+=`<div class="${cls}" ${click}>`;
+    html+=`<div class="dn"><div class="dn-inner">${c.day}</div></div>`;
+    dayLeaves.slice(0,2).forEach(l=>{
+      const li=leaves.indexOf(l);
+      html+=`<div class="leave-tag ${tagClass(l.type)}" onclick="event.stopPropagation();showDetail(event,${li})" title="${l.name}">${l.name.split(' ')[0]}</div>`;
+    });
+    if(dayLeaves.length>2) html+=`<div class="more-tag" onclick="event.stopPropagation();openAddLeave('${dStr}')">+${dayLeaves.length-2} more</div>`;
+    html+=`</div>`;
+  });
+  html+=`</div></div>`;
+  document.getElementById('calContainer').innerHTML=html;
+}
+
+function renderWeek(){
+  const d=new Date(currentDate);
+  const start=new Date(d); start.setDate(d.getDate()-d.getDay());
+  const week=Array.from({length:7},(_,i)=>{const x=new Date(start);x.setDate(start.getDate()+i);return x;});
+  document.getElementById('calTitle').textContent =
+    `${week[0].getDate()} ${MONTHS_SHORT[week[0].getMonth()]} – ${week[6].getDate()} ${MONTHS_SHORT[week[6].getMonth()]} ${week[6].getFullYear()}`;
+  const todayStr=ds(today);
+
+  let html=`<table class="week-table" style="border:1px solid var(--border);border-radius:12px;overflow:hidden"><thead><tr><th></th>`;
+  week.forEach((d,i)=>{
+    const isWe=i===0||i===6;
+    html+=`<th class="${isWe?'we':''}">${DAYS[i]}<br><span style="font-size:14px;font-weight:700;color:${ds(d)===todayStr?'var(--blue2)':'var(--text)'}">${d.getDate()}</span></th>`;
+  });
+  html+=`</tr></thead><tbody>`;
+
+  // All-day / leave row
+  html+=`<tr><td style="padding:8px;font-size:11px;color:var(--text3);white-space:nowrap;border-right:1px solid var(--border)">Leaves</td>`;
+  week.forEach((d,i)=>{
+    const isWe=i===0||i===6;
+    const dStr=ds(d);
+    const dl=leaves.filter(l=>l.date===dStr);
+    html+=`<td class="${isWe?'we':''}" ${!isWe?`onclick="openAddLeave('${dStr}')"`:''}">`;
+    dl.forEach(l=>{
+      const li=leaves.indexOf(l);
+      html+=`<div class="leave-tag ${tagClass(l.type)}" onclick="event.stopPropagation();showDetail(event,${li})">${l.name.split(' ')[0]}</div>`;
+    });
+    if(!isWe) html+=`<div class="week-add-hint">+ add leave</div>`;
+    html+=`</td>`;
+  });
+  html+=`</tr>`;
+
+  // Time slots
+  for(let h=9;h<=18;h++){
+    html+=`<tr><td style="padding:6px 8px;font-size:11px;color:var(--text3);white-space:nowrap;border-right:1px solid var(--border)">${h}:00</td>`;
+    week.forEach((_,i)=>{
+      const isWe=i===0||i===6;
+      html+=`<td class="${isWe?'we':''}" style="height:44px"></td>`;
+    });
+    html+=`</tr>`;
+  }
+  html+=`</tbody></table>`;
+  document.getElementById('calContainer').innerHTML=html;
+}
+
+function switchView(v){
+  currentView=v;
+  document.getElementById('btnMonth').classList.toggle('active',v==='month');
+  document.getElementById('btnWeek').classList.toggle('active',v==='week');
+  render();
+}
+function navigate(dir){
+  if(currentView==='month') currentDate.setMonth(currentDate.getMonth()+dir);
+  else currentDate.setDate(currentDate.getDate()+dir*7);
+  render();
+}
+function goToday(){currentDate=new Date(today);render();}
+
+// ═══════════════════════════════════════════
+//  LEAVE LOG
+// ═══════════════════════════════════════════
+function renderLog(){
+  const el=document.getElementById('logContainer');
+  if(!el) return;
+  const fm=document.getElementById('filterMember')?.value||'';
+  const ft=document.getElementById('filterType')?.value||'';
+  let data=[...leaves].filter(l=>(!fm||l.name===fm)&&(!ft||l.type===ft));
+  data.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(!data.length){
+    el.innerHTML=`<div class="empty-state"><div class="icon">📭</div><p>No leave entries found.</p></div>`;
+    return;
+  }
+  el.innerHTML=`<table class="log-table">
+    <thead><tr><th>#</th><th>Member</th><th>Date</th><th>Type</th><th>Reason</th><th></th></tr></thead>
+    <tbody>${data.map((l,i)=>{
+      const li=leaves.indexOf(l);
+      return `<tr>
+        <td style="color:var(--text3);font-family:'DM Mono'">${i+1}</td>
+        <td style="font-weight:600">${l.name}</td>
+        <td style="font-family:'DM Mono';color:var(--text2)">${formatDate(l.date)}</td>
+        <td><span class="leave-tag ${tagClass(l.type)}" style="display:inline-block">${typeLabel(l.type)}</span></td>
+        <td style="color:var(--text2);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.reason||'—'}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="confirmDelete(${li})">✕</button></td>
+      </tr>`;
+    }).join('')}</tbody></table>`;
+}
+
+function confirmDelete(idx){
+  if(confirm(`Remove leave for ${leaves[idx].name} on ${formatDate(leaves[idx].date)}?`)){
+    leaves.splice(idx,1);
+    renderAll();
+    toast('Leave entry removed');
+  }
+}
+
+// ═══════════════════════════════════════════
+//  SUMMARY
+// ═══════════════════════════════════════════
+function renderSummary(){
+  const el=document.getElementById('summaryContainer');
+  if(!el) return;
+  const now=new Date();
+  const months=[];
+  for(let i=5;i>=0;i--){
+    let m=now.getMonth()-i, y=now.getFullYear();
+    while(m<0){m+=12;y--;}
+    months.push({y,m,label:`${MONTHS_SHORT[m]} ${y}`});
+  }
+  let html=`<table class="sum-table"><thead><tr>
+    <th>Member</th>
+    ${months.map(mo=>`<th>${mo.label}</th>`).join('')}
+    <th>Total</th>
+  </tr></thead><tbody>`;
+
+  let colTotals=Array(months.length+1).fill(0);
+  members.forEach(mem=>{
+    const counts=months.map(mo=>leaves.filter(l=>{
+      const d=new Date(l.date+'T00:00:00');
+      return l.name===mem.name&&d.getMonth()===mo.m&&d.getFullYear()===mo.y;
+    }).length);
+    const total=counts.reduce((a,b)=>a+b,0);
+    counts.forEach((c,i)=>colTotals[i]+=c);
+    colTotals[months.length]+=total;
+    html+=`<tr>
+      <td>${mem.name}<div style="font-size:11px;color:var(--text3);font-weight:400">${mem.role}</div></td>
+      ${counts.map(c=>`<td><span class="cell-val ${c===0?'cv-0':c===1?'cv-1':c===2?'cv-2':'cv-3plus'}">${c||'—'}</span></td>`).join('')}
+      <td><span class="cell-val ${total===0?'cv-0':total<=2?'cv-1':total<=4?'cv-2':'cv-3plus'}" style="width:auto;padding:4px 10px">${total}</span></td>
+    </tr>`;
+  });
+  html+=`</tbody><tfoot><tr>
+    <td>Team Total</td>
+    ${colTotals.map((c,i)=>`<td style="font-family:'DM Mono'">${c}</td>`).join('')}
+  </tr></tfoot></table>`;
+  el.innerHTML=html;
+}
+
+// ═══════════════════════════════════════════
+//  MODALS
+// ═══════════════════════════════════════════
+function openAddLeave(dateStr){
+  selectedDateStr = dateStr || ds(today);
+  const d = dateStr ? new Date(dateStr+'T00:00:00') : today;
+  document.getElementById('leaveModalTitle').textContent =
+    dateStr ? `Add Leave — ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}` : 'Add Leave';
+  document.getElementById('leaveDateInput').value = selectedDateStr;
+  document.getElementById('leaveReason').value = '';
+  document.getElementById('leaveOverlay').classList.add('open');
+}
+function closeLeaveModal(){document.getElementById('leaveOverlay').classList.remove('open')}
+
+function saveLeave(){
+  const name = document.getElementById('leaveNameSel').value;
+  const date = document.getElementById('leaveDateInput').value;
+  const type = document.getElementById('leaveTypeSel').value;
+  const reason = document.getElementById('leaveReason').value.trim();
+  if(!name||!date) return;
+  // Check weekend
+  const d=new Date(date+'T00:00:00');
+  if(d.getDay()===0||d.getDay()===6){toast('⚠ Cannot add leave on weekends');return;}
+  leaves.push({date,name,type,reason:reason||'No reason provided'});
+  closeLeaveModal();
+  renderAll();
+  toast(`Leave added for ${name}`);
+}
+
+function deleteMember(idx){
+  const name=members[idx].name;
+  if(confirm(`Remove ${name} from the team?\n\nNote: Their leave records will be kept in the log.`)){
+    members.splice(idx,1);
+    renderAll();
+    toast(`${name} removed from team`);
+  }
+}
+
+
+function openAddMember(){
+  document.getElementById('newName').value='';
+  document.getElementById('newRole').value='';
+  document.getElementById('memberOverlay').classList.add('open');
+}
+function closeMemberModal(){document.getElementById('memberOverlay').classList.remove('open')}
+function saveNewMember(){
+  const name=document.getElementById('newName').value.trim();
+  const role=document.getElementById('newRole').value.trim();
+  if(!name) return;
+  members.push({name,role:role||'Team Member'});
+  closeMemberModal();
+  renderAll();
+  toast(`${name} added to the team`);
+}
+
+function showDetail(e,idx){
+  e.stopPropagation();
+  detailIdx=idx;
+  const l=leaves[idx];
+  const d=new Date(l.date+'T00:00:00');
+  document.getElementById('dpTitle').textContent=`${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;
+  document.getElementById('dpName').textContent=l.name;
+  document.getElementById('dpType').textContent=typeLabel(l.type);
+  document.getElementById('dpReason').textContent=l.reason;
+  const pop=document.getElementById('detailPop');
+  pop.style.left=Math.min(e.clientX,window.innerWidth-300)+'px';
+  pop.style.top=Math.min(e.clientY+12,window.innerHeight-200)+'px';
+  pop.classList.add('open');
+}
+function closeDetail(){document.getElementById('detailPop').classList.remove('open')}
+function deleteLeave(){
+  if(detailIdx>=0){leaves.splice(detailIdx,1);closeDetail();renderAll();toast('Leave entry removed')}
+}
+
+// ═══════════════════════════════════════════
+//  RENDER ALL
+// ═══════════════════════════════════════════
+function renderAll(){
+  updateStats();
+  renderMembersGrid();
+  renderMembersFull();
+  renderRecentLeaves();
+  updateMemberSelects();
+  if(activeTab==='calendar') render();
+  if(activeTab==='log') renderLog();
+  if(activeTab==='summary') renderSummary();
+  if(activeTab==='members') renderMembersFull();
+}
+
+// ═══════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════
+function exportCSV(){
+  if(!leaves.length){toast('No data to export');return;}
+  const rows=[['Member','Date','Type','Reason'],
+    ...leaves.map(l=>[l.name,l.date,typeLabel(l.type),l.reason])];
+  const csv=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='team_leaves.csv';a.click();
+  toast('CSV exported!');
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#detailPop')&&!e.target.closest('.leave-tag')&&!e.target.closest('.more-tag')) closeDetail();
+});
+document.getElementById('leaveOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('leaveOverlay'))closeLeaveModal()});
+document.getElementById('memberOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('memberOverlay'))closeMemberModal()});
+
+// Sidebar date
+const now=new Date();
+document.getElementById('sidebarDate').textContent=`${now.getDate()} ${MONTHS_SHORT[now.getMonth()]} ${now.getFullYear()}`;
+
+// Nav click fix
+document.querySelectorAll('.nav-item').forEach((el,i)=>{
+  const tabs=['dashboard','calendar','log','summary','members'];
+  el.onclick=()=>showTab(tabs[i]);
+});
+
+renderAll();
+</script>
+</body>
+</html>
