@@ -38,6 +38,7 @@
   --pers-fg:      #c4b5fd;
   --pers-border:  rgba(124,58,237,0.3);
 }
+html,body{width:100%}
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:14px}
 body{
@@ -51,9 +52,9 @@ body{
 }
 
 /* ── Layout ── */
-.shell{display:flex;min-height:100vh}
+.shell{display:flex;min-height:100vh;width:100%}
 .sidebar{
-  width:220px;flex-shrink:0;
+  width:180px;flex-shrink:0;
   background:rgba(15,27,45,0.95);
   border-right:1px solid var(--border);
   display:flex;flex-direction:column;
@@ -84,10 +85,10 @@ body{
 .sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
 .sidebar-footer p{font-size:11px;color:var(--text3)}
 
-.main{flex:1;overflow:auto}
+.main{flex:1;overflow:auto;min-width:0;width:100%}
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:16px 28px;
+  padding:16px 32px;
   border-bottom:1px solid var(--border);
   background:rgba(15,27,45,0.8);
   backdrop-filter:blur(20px);
@@ -97,7 +98,7 @@ body{
 .topbar-meta{font-size:12px;color:var(--text3);margin-top:1px}
 .topbar-right{display:flex;gap:8px;align-items:center}
 
-.content{padding:24px 28px}
+.content{padding:24px 32px}
 
 /* ── Buttons ── */
 .btn{
@@ -118,7 +119,7 @@ body{
 .btn-danger:hover{background:rgba(220,38,38,0.18)}
 
 /* ── Stats cards ── */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
 .stat-card{
   background:var(--card);border:1px solid var(--border);
   border-radius:12px;padding:18px 20px;
@@ -383,7 +384,8 @@ body{
     </div>
     <div class="sidebar-footer">
       <p id="sidebarDate"></p>
-      <p style="margin-top:4px;color:#3b82f6;font-size:11px">● Live data</p>
+      <p style="margin-top:4px;color:#3b82f6;font-size:11px" id="syncStatus">● Connecting...</p>
+      <button onclick="resetCredentials()" style="margin-top:10px;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#64748b;font-size:11px;padding:5px 10px;cursor:pointer;width:100%;font-family:inherit">🔑 Reset credentials</button>
     </div>
   </aside>
 
@@ -530,9 +532,18 @@ body{
       <label>Member Name</label>
       <select id="leaveNameSel"></select>
     </div>
-    <div class="field">
-      <label>Leave Date</label>
-      <input type="date" id="leaveDateInput"/>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field">
+        <label>Start Date</label>
+        <input type="date" id="leaveStartDate" onchange="onStartDateChange()"/>
+      </div>
+      <div class="field">
+        <label>End Date</label>
+        <input type="date" id="leaveEndDate" onchange="updateDayCount()"/>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin:-10px 0 14px;min-height:18px">
+      <span id="leaveDayCount" style="color:var(--blue2);font-weight:600"></span>
     </div>
     <div class="field">
       <label>Leave Type</label>
@@ -587,6 +598,41 @@ body{
 <!-- Toast -->
 <div class="toast" id="toast">✓ <span id="toastMsg"></span></div>
 
+<!-- Spinner -->
+<div id="spinnerOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(6px)">
+  <div style="width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:#3b82f6;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+  <div id="spinnerMsg" style="color:#e2e8f0;font-size:14px;font-weight:500">Loading...</div>
+</div>
+
+<!-- Setup / Login Modal -->
+<div id="setupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:600;align-items:center;justify-content:center;backdrop-filter:blur(8px)">
+  <div style="background:#1a2942;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px;width:100%;max-width:420px;box-shadow:0 24px 64px rgba(0,0,0,0.6)">
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:32px;margin-bottom:8px">🏠</div>
+      <div style="font-size:18px;font-weight:700;color:#e2e8f0">Team Hub — Connect to Confluence</div>
+      <div style="font-size:12px;color:#64748b;margin-top:6px">Your credentials are saved only in your browser</div>
+    </div>
+    <div style="background:rgba(37,99,235,0.1);border:1px solid rgba(37,99,235,0.2);border-radius:8px;padding:12px 14px;margin-bottom:20px;font-size:12px;color:#93c5fd;line-height:1.6">
+      📌 <strong>One-time setup per browser.</strong> Get your API token from<br>
+      <a href="https://id.atlassian.com/manage-api-tokens" target="_blank" style="color:#60a5fa">id.atlassian.com/manage-api-tokens</a>
+    </div>
+    <div class="field"><label style="display:block;font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:6px">Your Atlassian Email</label>
+      <input type="email" id="setupEmail" placeholder="you@company.com" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e2e8f0;font-size:13px;outline:none;font-family:inherit"/>
+    </div>
+    <div class="field" style="margin-top:12px"><label style="display:block;font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:6px">API Token</label>
+      <input type="password" id="setupToken" placeholder="Paste your API token here" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e2e8f0;font-size:13px;outline:none;font-family:inherit"/>
+    </div>
+    <div id="setupError" style="color:#fca5a5;font-size:12px;margin-top:8px;min-height:16px"></div>
+    <button onclick="saveSetup()" style="width:100%;margin-top:16px;padding:12px;background:#2563eb;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
+      Connect to Confluence →
+    </button>
+  </div>
+</div>
+
+<style>
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+
 <script>
 // ═══════════════════════════════════════════
 //  DATA
@@ -595,7 +641,17 @@ const MONTHS = ['January','February','March','April','May','June','July','August
 const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-let members = [
+const today = new Date();
+today.setHours(0,0,0,0);
+function ds(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+
+// ── Confluence config ──
+const CONF_BASE    = 'https://lbg.atlassian.net/wiki';
+const CONF_PAGE_ID = '727702831';
+const CRED_KEY     = 'teamhub_credentials';
+
+// ── Default seed data ──
+const DEFAULT_MEMBERS = [
   {name:'Arjun Roy',     role:'Tech Lead'},
   {name:'Priya Sen',     role:'Backend Dev'},
   {name:'Dev Mukherjee', role:'Frontend Dev'},
@@ -607,17 +663,125 @@ let members = [
   {name:'Sourav Biswas', role:'Analyst'},
 ];
 
-const today = new Date();
-today.setHours(0,0,0,0);
-function ds(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function buildDefaultLeaves(){
+  const y=today.getFullYear(), m=String(today.getMonth()+1).padStart(2,'0');
+  return [
+    {date:`${y}-${m}-09`, name:'Priya Sen',     type:'sick',      reason:'Fever and cold'},
+    {date:`${y}-${m}-11`, name:'Dev Mukherjee', type:'planned',   reason:'Family vacation'},
+    {date:`${y}-${m}-16`, name:'Sana Khan',     type:'emergency', reason:'Family emergency'},
+    {date:`${y}-${m}-22`, name:'Ritesh Bose',   type:'personal',  reason:'Personal appointment'},
+    {date:`${y}-${m}-25`, name:'Tanya Ghosh',   type:'planned',   reason:'Attending wedding'},
+  ];
+}
 
-let leaves = [
-  {date:`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-09`, name:'Priya Sen',     type:'sick',      reason:'Fever and cold'},
-  {date:`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-11`, name:'Dev Mukherjee',type:'planned',   reason:'Family vacation'},
-  {date:`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-16`, name:'Sana Khan',    type:'emergency', reason:'Family emergency'},
-  {date:`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-22`, name:'Ritesh Bose',  type:'personal',  reason:'Personal appointment'},
-  {date:`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-25`, name:'Tanya Ghosh',  type:'planned',   reason:'Attending wedding'},
-];
+let members = [...DEFAULT_MEMBERS];
+let leaves  = buildDefaultLeaves();
+let confCredentials = null; // {email, token}
+
+// ── Credential helpers ──
+function loadCredentials(){
+  try{
+    const c = localStorage.getItem(CRED_KEY);
+    return c ? JSON.parse(c) : null;
+  }catch(e){return null;}
+}
+function saveCredentials(email, token){
+  localStorage.setItem(CRED_KEY, JSON.stringify({email, token}));
+  confCredentials = {email, token};
+}
+function clearCredentials(){
+  localStorage.removeItem(CRED_KEY);
+  confCredentials = null;
+}
+function getAuthHeader(){
+  if(!confCredentials) return null;
+  return 'Basic ' + btoa(confCredentials.email + ':' + confCredentials.token);
+}
+
+// ── Confluence API ──
+async function cfFetch(path, opts={}){
+  const auth = getAuthHeader();
+  if(!auth) throw new Error('No credentials');
+  const res = await fetch(CONF_BASE + path, {
+    mode: 'cors',
+    credentials: 'omit',
+    ...opts,
+    headers:{
+      'Authorization': auth,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      ...(opts.headers||{})
+    }
+  });
+  if(!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text().catch(()=>'')}`);
+  return res.json();
+}
+
+async function loadFromConfluence(){
+  showSpinner('Loading data from Confluence...');
+  try{
+    const data = await cfFetch(`/rest/api/content/${CONF_PAGE_ID}?expand=body.storage,version`);
+    const html  = data.body.storage.value;
+    // Data stored as JSON inside a hidden <div id="teamhub-data">
+    const match = html.match(/<div id="teamhub-data">([\s\S]*?)<\/div>/);
+    if(match){
+      const parsed = JSON.parse(decodeURIComponent(match[1]));
+      members = parsed.members || DEFAULT_MEMBERS;
+      leaves  = parsed.leaves  || buildDefaultLeaves();
+    } else {
+      // First time — save defaults
+      members = [...DEFAULT_MEMBERS];
+      leaves  = buildDefaultLeaves();
+      await saveToConfluence(data.version.number);
+    }
+    hideSpinner();
+    const el = document.getElementById('syncStatus');
+    if(el) el.textContent = '● Live — Confluence';
+    return true;
+  }catch(e){
+    hideSpinner();
+    console.error('Confluence load error:', e);
+    const el = document.getElementById('syncStatus');
+    if(el){ el.textContent = '● Offline'; el.style.color='#f87171'; }
+    return false;
+  }
+}
+
+async function saveToConfluence(knownVersion){
+  try{
+    // Get current version if not provided
+    let version = knownVersion;
+    if(!version){
+      const cur = await cfFetch(`/rest/api/content/${CONF_PAGE_ID}?expand=version`);
+      version = cur.version.number;
+    }
+    const payload = encodeURIComponent(JSON.stringify({members, leaves}));
+    const body = `<div id="teamhub-data">${payload}</div>`;
+    await cfFetch(`/rest/api/content/${CONF_PAGE_ID}`, {
+      method:'PUT',
+      body: JSON.stringify({
+        version:{ number: version + 1 },
+        title:'TeamHub Data Store',
+        type:'page',
+        body:{ storage:{ value: body, representation:'storage' }}
+      })
+    });
+    const el=document.getElementById('syncStatus');
+    const t=new Date();
+    if(el){el.textContent=`● Saved ${t.getHours()}:${String(t.getMinutes()).padStart(2,'0')}`;el.style.color='#4ade80';}
+    return true;
+  }catch(e){
+    console.error('Confluence save error:', e);
+    toast('⚠ Could not save to Confluence — check your credentials');
+    const el=document.getElementById('syncStatus');
+    if(el){el.textContent='⚠ Save failed';el.style.color='#f87171';}
+    return false;
+  }
+}
+
+async function saveData(){
+  await saveToConfluence(null);
+}
 
 let currentDate = new Date(today);
 let currentView = 'month';
@@ -732,8 +896,9 @@ function renderMembersFull(){
     }).join('')}
     </tbody>
   </table>
-  <div style="margin-top:14px">
+  <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
     <button class="btn btn-primary btn-sm" onclick="openAddMember()">+ Add New Member</button>
+    <button class="btn btn-sm" onclick="clearAllData()" style="color:#fca5a5;border-color:rgba(220,38,38,0.3);background:rgba(220,38,38,0.08);margin-left:auto">🗑 Clear All Data</button>
   </div>`;
 }
 
@@ -949,28 +1114,58 @@ function renderSummary(){
 // ═══════════════════════════════════════════
 function openAddLeave(dateStr){
   selectedDateStr = dateStr || ds(today);
-  const d = dateStr ? new Date(dateStr+'T00:00:00') : today;
-  document.getElementById('leaveModalTitle').textContent =
-    dateStr ? `Add Leave — ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}` : 'Add Leave';
-  document.getElementById('leaveDateInput').value = selectedDateStr;
+  document.getElementById('leaveModalTitle').textContent = 'Add Leave';
+  document.getElementById('leaveStartDate').value = selectedDateStr;
+  document.getElementById('leaveEndDate').value = selectedDateStr;
   document.getElementById('leaveReason').value = '';
+  document.getElementById('leaveDayCount').textContent = '1 working day';
   document.getElementById('leaveOverlay').classList.add('open');
 }
 function closeLeaveModal(){document.getElementById('leaveOverlay').classList.remove('open')}
 
 function saveLeave(){
   const name = document.getElementById('leaveNameSel').value;
-  const date = document.getElementById('leaveDateInput').value;
+  const startDate = document.getElementById('leaveStartDate').value;
+  const endDate = document.getElementById('leaveEndDate').value;
   const type = document.getElementById('leaveTypeSel').value;
   const reason = document.getElementById('leaveReason').value.trim();
-  if(!name||!date) return;
-  // Check weekend
-  const d=new Date(date+'T00:00:00');
-  if(d.getDay()===0||d.getDay()===6){toast('⚠ Cannot add leave on weekends');return;}
-  leaves.push({date,name,type,reason:reason||'No reason provided'});
+  if(!name||!startDate||!endDate) return;
+  if(endDate < startDate){toast('⚠ End date cannot be before start date');return;}
+  // Generate one entry per working day in range
+  const start = new Date(startDate+'T00:00:00');
+  const end   = new Date(endDate+'T00:00:00');
+  let added = 0;
+  for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+    if(d.getDay()===0||d.getDay()===6) continue; // skip weekends
+    leaves.push({date:ds(d), name, type, reason:reason||'No reason provided'});
+    added++;
+  }
+  if(added===0){toast('⚠ Selected range has no working days');return;}
   closeLeaveModal();
   renderAll();
-  toast(`Leave added for ${name}`);
+  toast(`${added} day${added>1?'s':''} of leave added for ${name}`);
+}
+
+function onStartDateChange(){
+  const s = document.getElementById('leaveStartDate').value;
+  const endEl = document.getElementById('leaveEndDate');
+  // end date must be >= start date
+  endEl.min = s;
+  if(endEl.value && endEl.value < s) endEl.value = s;
+  updateDayCount();
+}
+
+function updateDayCount(){
+  const s = document.getElementById('leaveStartDate').value;
+  const e = document.getElementById('leaveEndDate').value;
+  const el = document.getElementById('leaveDayCount');
+  if(!s||!e||e<s){el.textContent='';return;}
+  const start=new Date(s+'T00:00:00'), end=new Date(e+'T00:00:00');
+  let count=0;
+  for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){
+    if(d.getDay()!==0&&d.getDay()!==6) count++;
+  }
+  el.textContent = count===0 ? '⚠ No working days in range' : `📅 ${count} working day${count>1?'s':''}`;
 }
 
 function deleteMember(idx){
@@ -1021,7 +1216,8 @@ function deleteLeave(){
 // ═══════════════════════════════════════════
 //  RENDER ALL
 // ═══════════════════════════════════════════
-function renderAll(){
+function renderAll(skipSave=false){
+  if(!skipSave) saveData();
   updateStats();
   renderMembersGrid();
   renderMembersFull();
@@ -1031,6 +1227,18 @@ function renderAll(){
   if(activeTab==='log') renderLog();
   if(activeTab==='summary') renderSummary();
   if(activeTab==='members') renderMembersFull();
+}
+
+// ═══════════════════════════════════════════
+//  CLEAR DATA
+// ═══════════════════════════════════════════
+async function clearAllData(){
+  if(!confirm('This will permanently delete ALL members and leave records from Confluence. Are you sure?')) return;
+  members = [...DEFAULT_MEMBERS];
+  leaves  = buildDefaultLeaves();
+  await saveData();
+  renderAll(true);
+  toast('All data cleared and reset to defaults');
 }
 
 // ═══════════════════════════════════════════
@@ -1066,7 +1274,66 @@ document.querySelectorAll('.nav-item').forEach((el,i)=>{
   el.onclick=()=>showTab(tabs[i]);
 });
 
-renderAll();
+// ── Spinner helpers ──
+function showSpinner(msg='Loading...'){
+  document.getElementById('spinnerMsg').textContent = msg;
+  document.getElementById('spinnerOverlay').style.display='flex';
+}
+function hideSpinner(){
+  document.getElementById('spinnerOverlay').style.display='none';
+}
+
+// ── Boot ──
+async function boot(){
+  confCredentials = loadCredentials();
+  if(!confCredentials){
+    showSetupModal();
+  } else {
+    const ok = await loadFromConfluence();
+    if(!ok){
+      // Credentials may be wrong — show setup again
+      showSetupModal('Could not connect to Confluence. Please check your credentials.');
+    } else {
+      renderAll(true);
+    }
+  }
+}
+
+function showSetupModal(errMsg=''){
+  document.getElementById('setupError').textContent = errMsg;
+  document.getElementById('setupOverlay').style.display='flex';
+}
+
+function closeSetupModal(){
+  document.getElementById('setupOverlay').style.display='none';
+}
+
+async function saveSetup(){
+  const email = document.getElementById('setupEmail').value.trim();
+  const token = document.getElementById('setupToken').value.trim();
+  if(!email||!token){
+    document.getElementById('setupError').textContent='Please enter both email and API token.';
+    return;
+  }
+  saveCredentials(email, token);
+  closeSetupModal();
+  const ok = await loadFromConfluence();
+  if(!ok){
+    clearCredentials();
+    showSetupModal('Could not connect. Please check your email and API token.');
+  } else {
+    renderAll(true);
+    toast('Connected to Confluence successfully!');
+  }
+}
+
+function resetCredentials(){
+  if(!confirm('This will log you out and clear your saved credentials. Continue?')) return;
+  clearCredentials();
+  showSetupModal();
+}
+
+boot();
 </script>
 </body>
 </html>
