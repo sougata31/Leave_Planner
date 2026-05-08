@@ -38,6 +38,7 @@
   --pers-fg:      #c4b5fd;
   --pers-border:  rgba(124,58,237,0.3);
 }
+html,body{width:100%}
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:14px}
 body{
@@ -51,9 +52,9 @@ body{
 }
 
 /* ── Layout ── */
-.shell{display:flex;min-height:100vh}
+.shell{display:flex;min-height:100vh;width:100%}
 .sidebar{
-  width:220px;flex-shrink:0;
+  width:180px;flex-shrink:0;
   background:rgba(15,27,45,0.95);
   border-right:1px solid var(--border);
   display:flex;flex-direction:column;
@@ -84,10 +85,10 @@ body{
 .sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
 .sidebar-footer p{font-size:11px;color:var(--text3)}
 
-.main{flex:1;overflow:auto}
+.main{flex:1;overflow:auto;min-width:0;width:100%}
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:16px 28px;
+  padding:16px 32px;
   border-bottom:1px solid var(--border);
   background:rgba(15,27,45,0.8);
   backdrop-filter:blur(20px);
@@ -97,7 +98,7 @@ body{
 .topbar-meta{font-size:12px;color:var(--text3);margin-top:1px}
 .topbar-right{display:flex;gap:8px;align-items:center}
 
-.content{padding:24px 28px}
+.content{padding:24px 32px}
 
 /* ── Buttons ── */
 .btn{
@@ -118,7 +119,7 @@ body{
 .btn-danger:hover{background:rgba(220,38,38,0.18)}
 
 /* ── Stats cards ── */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
 .stat-card{
   background:var(--card);border:1px solid var(--border);
   border-radius:12px;padding:18px 20px;
@@ -530,9 +531,18 @@ body{
       <label>Member Name</label>
       <select id="leaveNameSel"></select>
     </div>
-    <div class="field">
-      <label>Leave Date</label>
-      <input type="date" id="leaveDateInput"/>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field">
+        <label>Start Date</label>
+        <input type="date" id="leaveStartDate" onchange="onStartDateChange()"/>
+      </div>
+      <div class="field">
+        <label>End Date</label>
+        <input type="date" id="leaveEndDate" onchange="updateDayCount()"/>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin:-10px 0 14px;min-height:18px">
+      <span id="leaveDayCount" style="color:var(--blue2);font-weight:600"></span>
     </div>
     <div class="field">
       <label>Leave Type</label>
@@ -949,28 +959,58 @@ function renderSummary(){
 // ═══════════════════════════════════════════
 function openAddLeave(dateStr){
   selectedDateStr = dateStr || ds(today);
-  const d = dateStr ? new Date(dateStr+'T00:00:00') : today;
-  document.getElementById('leaveModalTitle').textContent =
-    dateStr ? `Add Leave — ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}` : 'Add Leave';
-  document.getElementById('leaveDateInput').value = selectedDateStr;
+  document.getElementById('leaveModalTitle').textContent = 'Add Leave';
+  document.getElementById('leaveStartDate').value = selectedDateStr;
+  document.getElementById('leaveEndDate').value = selectedDateStr;
   document.getElementById('leaveReason').value = '';
+  document.getElementById('leaveDayCount').textContent = '1 working day';
   document.getElementById('leaveOverlay').classList.add('open');
 }
 function closeLeaveModal(){document.getElementById('leaveOverlay').classList.remove('open')}
 
 function saveLeave(){
   const name = document.getElementById('leaveNameSel').value;
-  const date = document.getElementById('leaveDateInput').value;
+  const startDate = document.getElementById('leaveStartDate').value;
+  const endDate = document.getElementById('leaveEndDate').value;
   const type = document.getElementById('leaveTypeSel').value;
   const reason = document.getElementById('leaveReason').value.trim();
-  if(!name||!date) return;
-  // Check weekend
-  const d=new Date(date+'T00:00:00');
-  if(d.getDay()===0||d.getDay()===6){toast('⚠ Cannot add leave on weekends');return;}
-  leaves.push({date,name,type,reason:reason||'No reason provided'});
+  if(!name||!startDate||!endDate) return;
+  if(endDate < startDate){toast('⚠ End date cannot be before start date');return;}
+  // Generate one entry per working day in range
+  const start = new Date(startDate+'T00:00:00');
+  const end   = new Date(endDate+'T00:00:00');
+  let added = 0;
+  for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+    if(d.getDay()===0||d.getDay()===6) continue; // skip weekends
+    leaves.push({date:ds(d), name, type, reason:reason||'No reason provided'});
+    added++;
+  }
+  if(added===0){toast('⚠ Selected range has no working days');return;}
   closeLeaveModal();
   renderAll();
-  toast(`Leave added for ${name}`);
+  toast(`${added} day${added>1?'s':''} of leave added for ${name}`);
+}
+
+function onStartDateChange(){
+  const s = document.getElementById('leaveStartDate').value;
+  const endEl = document.getElementById('leaveEndDate');
+  // end date must be >= start date
+  endEl.min = s;
+  if(endEl.value && endEl.value < s) endEl.value = s;
+  updateDayCount();
+}
+
+function updateDayCount(){
+  const s = document.getElementById('leaveStartDate').value;
+  const e = document.getElementById('leaveEndDate').value;
+  const el = document.getElementById('leaveDayCount');
+  if(!s||!e||e<s){el.textContent='';return;}
+  const start=new Date(s+'T00:00:00'), end=new Date(e+'T00:00:00');
+  let count=0;
+  for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){
+    if(d.getDay()!==0&&d.getDay()!==6) count++;
+  }
+  el.textContent = count===0 ? '⚠ No working days in range' : `📅 ${count} working day${count>1?'s':''}`;
 }
 
 function deleteMember(idx){
